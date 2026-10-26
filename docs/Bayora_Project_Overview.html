@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Bayora — Executive Project Overview & Architecture Specification</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+
+    @page {
+      size: A4;
+      margin: 16mm 18mm 16mm 18mm;
+    }
+
+    * {
+      box-sizing: border-box;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+      color: #0f172a;
+      background: #ffffff;
+      line-height: 1.5;
+      font-size: 10.5pt;
+      margin: 0;
+      padding: 0;
+    }
+
+    .page-break {
+      page-break-after: always;
+      break-after: page;
+    }
+
+    /* Header styling */
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      border-bottom: 2.5px solid #2563eb;
+      padding-bottom: 12px;
+      margin-bottom: 20px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .logo-badge {
+      width: 44px;
+      height: 44px;
+      background: linear-gradient(135deg, #2563eb, #4f46e5, #7c3aed);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #ffffff;
+      font-weight: 800;
+      font-size: 20pt;
+      box-shadow: 0 4px 10px rgba(37, 99, 235, 0.25);
+    }
+
+    .title-group h1 {
+      margin: 0;
+      font-size: 19pt;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      color: #0f172a;
+    }
+
+    .title-group p {
+      margin: 2px 0 0 0;
+      font-size: 10pt;
+      color: #475569;
+      font-weight: 600;
+    }
+
+    .meta-badge {
+      background: #f1f5f9;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      padding: 6px 12px;
+      font-size: 8.5pt;
+      text-align: right;
+      color: #334155;
+    }
+
+    .meta-badge strong {
+      color: #0f172a;
+    }
+
+    /* Executive Highlight Banner */
+    .banner {
+      background: linear-gradient(135deg, #0f172a, #1e293b);
+      color: #ffffff;
+      padding: 16px 20px;
+      border-radius: 12px;
+      margin-bottom: 22px;
+      box-shadow: 0 4px 12px rgba(15, 23, 42, 0.12);
+    }
+
+    .banner-title {
+      font-size: 11pt;
+      font-weight: 700;
+      color: #60a5fa;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 4px;
+    }
+
+    .banner-desc {
+      font-size: 9.5pt;
+      line-height: 1.45;
+      color: #e2e8f0;
+      margin: 0;
+    }
+
+    /* Section Styling */
+    h2 {
+      font-size: 13pt;
+      font-weight: 800;
+      color: #0f172a;
+      border-left: 4px solid #2563eb;
+      padding-left: 10px;
+      margin: 22px 0 10px 0;
+      letter-spacing: -0.3px;
+    }
+
+    h3 {
+      font-size: 10.5pt;
+      font-weight: 700;
+      color: #1e293b;
+      margin: 14px 0 6px 0;
+    }
+
+    p {
+      margin: 0 0 10px 0;
+      color: #334155;
+    }
+
+    /* Grid layouts */
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      margin-bottom: 14px;
+    }
+
+    .grid-3 {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .card {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 10px;
+      padding: 12px 14px;
+    }
+
+    .card-title {
+      font-size: 9.5pt;
+      font-weight: 700;
+      color: #0f172a;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 6px;
+    }
+
+    .card-desc {
+      font-size: 8.5pt;
+      color: #475569;
+      margin: 0;
+      line-height: 1.4;
+    }
+
+    .badge-red {
+      background: #fee2e2;
+      color: #b91c1c;
+      border: 1px solid #fecaca;
+      border-radius: 4px;
+      padding: 1px 6px;
+      font-size: 7.5pt;
+      font-weight: 700;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .badge-blue {
+      background: #e0f2fe;
+      color: #0369a1;
+      border: 1px solid #bae6fd;
+      border-radius: 4px;
+      padding: 1px 6px;
+      font-size: 7.5pt;
+      font-weight: 700;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .badge-purple {
+      background: #f3e8ff;
+      color: #7e22ce;
+      border: 1px solid #e9d5ff;
+      border-radius: 4px;
+      padding: 1px 6px;
+      font-size: 7.5pt;
+      font-weight: 700;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .badge-green {
+      background: #dcfce7;
+      color: #15803d;
+      border: 1px solid #bbf7d0;
+      border-radius: 4px;
+      padding: 1px 6px;
+      font-size: 7.5pt;
+      font-weight: 700;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    /* Diagram visualizer */
+    .diagram-box {
+      background: #0f172a;
+      color: #f8fafc;
+      border-radius: 10px;
+      padding: 16px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 8pt;
+      line-height: 1.35;
+      margin: 14px 0;
+      border: 1px solid #334155;
+    }
+
+    /* Pipeline 4 steps */
+    .pipeline-container {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      margin: 14px 0;
+    }
+
+    .step-box {
+      border-radius: 8px;
+      padding: 10px;
+      border: 1px solid;
+    }
+
+    .step-attack {
+      background: #fef2f2;
+      border-color: #fca5a5;
+    }
+
+    .step-detect {
+      background: #fffbeb;
+      border-color: #fde68a;
+    }
+
+    .step-defend {
+      background: #ecfeff;
+      border-color: #a5f3fc;
+    }
+
+    .step-retest {
+      background: #f0fdf4;
+      border-color: #86efac;
+    }
+
+    .step-header {
+      font-size: 8pt;
+      font-weight: 800;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+
+    .step-title {
+      font-size: 9pt;
+      font-weight: 700;
+      color: #0f172a;
+      margin-bottom: 4px;
+    }
+
+    .step-text {
+      font-size: 8pt;
+      color: #475569;
+      line-height: 1.3;
+      margin: 0;
+    }
+
+    /* Tables */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 12px 0;
+      font-size: 8.5pt;
+    }
+
+    th {
+      background: #f1f5f9;
+      color: #334155;
+      text-align: left;
+      padding: 7px 10px;
+      font-weight: 700;
+      border-bottom: 2px solid #cbd5e1;
+    }
+
+    td {
+      padding: 7px 10px;
+      border-bottom: 1px solid #e2e8f0;
+      color: #334155;
+    }
+
+    tr:nth-child(even) td {
+      background: #fafafa;
+    }
+
+    code {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 8pt;
+      background: #f1f5f9;
+      padding: 1px 4px;
+      border-radius: 4px;
+      color: #0f172a;
+    }
+
+    .footer {
+      margin-top: 24px;
+      border-top: 1px solid #cbd5e1;
+      padding-top: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 8pt;
+      color: #64748b;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- PAGE 1: Executive Overview, Problem Statement & Architecture -->
+  <div class="header">
+    <div class="brand">
+      <div class="logo-badge">🛡️</div>
+      <div class="title-group">
+        <h1>BAYORA</h1>
+        <p>Securing Adversarial AI Safety Testing Infrastructure</p>
+      </div>
+    </div>
+    <div class="meta-badge">
+      <strong>Team Avinya</strong><br>
+      Daksh Sharma • Raj • Somesh<br>
+      <em>AI Safety × Cybersecurity × Automation</em>
+    </div>
+  </div>
+
+  <div class="banner">
+    <div class="banner-title">Executive Summary</div>
+    <p class="banner-desc">
+      Bayora is a zero-trust AI safety testing platform that securely isolates the <strong>Red Team</strong>, <strong>Blue Team</strong>, and <strong>Client LLM</strong> while enabling continuous, blind adversarial evaluations and producing tamper-evident cryptographic evidence backed by a SHA-256 Hash Chain.
+    </p>
+  </div>
+
+  <h2>1. Problem Statement & Threat Landscape</h2>
+  <p>
+    As Large Language Models (LLMs) are deployed in high-assurance enterprise environments (banking, healthcare, national infrastructure), rigorous adversarial red-teaming has become mandatory. However, existing testing setups frequently execute Red Team exploits, Blue Team defenders, and client models inside shared Docker or Kubernetes environments. This creates severe systemic vulnerabilities:
+  </p>
+
+  <div class="grid-2">
+    <div class="card" style="border-left: 3px solid #dc2626;">
+      <div class="card-title">⚠️ Cross-Team Data Leakage</div>
+      <p class="card-desc">Red teams prematurely inspect active defense heuristics; Blue teams overfit directly on secret exploit corpora before real-world deployment.</p>
+    </div>
+    <div class="card" style="border-left: 3px solid #ea580c;">
+      <div class="card-title">⚠️ Model & Session Contamination</div>
+      <p class="card-desc">Unrestricted container sockets allow adversarial payloads to pollute multi-tenant model memory, context boundaries, or exfiltrate credentials.</p>
+    </div>
+    <div class="card" style="border-left: 3px solid #7c3aed;">
+      <div class="card-title">⚠️ Side-Channel & Timing Attacks</div>
+      <p class="card-desc">Attackers measure microsecond execution latency and CPU contention to extract confidential system prompt tokens and canary parameters.</p>
+    </div>
+    <div class="card" style="border-left: 3px solid #2563eb;">
+      <div class="card-title">⚠️ Unverifiable Evaluation Records</div>
+      <p class="card-desc">Test records and compliance logs are stored in mutable databases, making post-audit repudiation or undetected tampering a major legal risk.</p>
+    </div>
+  </div>
+
+  <h2>2. System Architecture & Zero-Trust Isolation Flow</h2>
+  <p>
+    Bayora enforces strict network micro-segmentation and policy mediation. No workload can communicate directly with peer workloads:
+  </p>
+
+  <div class="diagram-box">
+┌────────────────────────────────────────────────────────────────────────┐
+│                      WEB DASHBOARD (React + Vite)                      │
+│        Real-Time Telemetry • Threat Radar • Cryptographic Verifier     │
+└───────────────────────────────────┬────────────────────────────────────┘
+                                    │ (REST API & WebSockets)
+                                    ▼
+┌────────────────────────────────────────────────────────────────────────┐
+│                 BACKEND CONTROLLER & MEDIATION BROKER                  │
+│               Zero-Trust Test Orchestration & OPA Engine               │
+└───────────────────────────────────┬────────────────────────────────────┘
+                                    │
+        ┌───────────────────────────┼───────────────────────────┐
+        │                           │                           │
+        ▼                           ▼                           ▼
+┌───────────────┐           ┌───────────────┐           ┌───────────────┐
+│  🔴 RED TEAM  │           │   🤖 CLIENT   │           │ 🔵 BLUE TEAM  │
+│    SANDBOX    │  BLOCKED  │      LLM      │  BLOCKED  │    SANDBOX    │
+│  Adversarial  │◄─────────►│  Model Under  │◄─────────►│  AI Defender  │
+│    Attacker   │ (Zero-Tr) │     Test      │ (Blind T) │  Guardrails   │
+└───────┬───────┘           └───────┬───────┘           └───────┬───────┘
+  bayora-red-net              bayora-llm-net              bayora-blue-net
+  [Micro-Segmented]           [No Direct Sockets]         [Blind Testing]
+        │                           │                           │
+        └───────────────────────────┼───────────────────────────┘
+                                    ▼
+┌────────────────────────────────────────────────────────────────────────┐
+│                             SECURITY LAYER                             │
+│   • Linux cgroups & Seccomp Limits     • Open Policy Agent (Rego PBAC) │
+│   • Side-Channel Jitter Analysis       • Canary Vault Key Tripwires    │
+└───────────────────────────────────┬────────────────────────────────────┘
+                                    │
+                     ┌──────────────┴──────────────┐
+                     ▼                             ▼
+          ┌────────────────────┐        ┌────────────────────┐
+          │    TEST RESULTS    │        │  TAMPER-EVIDENT    │
+          │      DATABASE      │        │   SHA-256 LEDGER   │
+          └────────────────────┘        └────────────────────┘
+  </div>
+
+  <div class="footer">
+    <span>Bayora Technical Whitepaper • Team Avinya</span>
+    <span>Page 1 of 2</span>
+  </div>
+
+  <div class="page-break"></div>
+
+  <!-- PAGE 2: Signature Innovation, Core Capabilities, Verification & Tech Stack -->
+  <div class="header">
+    <div class="brand">
+      <div class="logo-badge">🛡️</div>
+      <div class="title-group">
+        <h1>BAYORA</h1>
+        <p>Continuous Security Loop & Verification Specification</p>
+      </div>
+    </div>
+    <div class="meta-badge">
+      <strong>Verification Report</strong><br>
+      27/27 Automated Tests Passing<br>
+      <em>GitHub: subwaycookiecrunch/Bayora</em>
+    </div>
+  </div>
+
+  <h2>3. The Signature Innovation: Continuous Security Loop</h2>
+  <p>
+    Bayora automates the closed-loop safety remediation cycle: <strong>Attack → Detect → Defend → Retest</strong>. Discovered vulnerabilities are autonomously patched and cryptographically certified in under 15 milliseconds:
+  </p>
+
+  <div class="pipeline-container">
+    <div class="step-box step-attack">
+      <div class="step-header" style="color: #b91c1c;">Step 1: Attack</div>
+      <div class="step-title">Red Sandbox</div>
+      <p class="step-text">Generates jailbreak, prompt injection, or mutated Base64 obfuscated exploit payload.</p>
+    </div>
+
+    <div class="step-box step-detect">
+      <div class="step-header" style="color: #b45309;">Step 2: Detect</div>
+      <div class="step-title">Baseline Probe</div>
+      <p class="step-text">Unshielded evaluation reveals model compromise (e.g. secret vault canary key leaked).</p>
+    </div>
+
+    <div class="step-box step-defend">
+      <div class="step-header" style="color: #0e7490;">Step 3: Defend</div>
+      <div class="step-title">Blue Auto-Patch</div>
+      <p class="step-text">Blue Team engine synthesizes dynamic heuristic guardrail rule matching the exploit vector.</p>
+    </div>
+
+    <div class="step-box step-retest">
+      <div class="step-header" style="color: #15803d;">Step 4: Retest</div>
+      <div class="step-title">Safety Verified</div>
+      <p class="step-text">Identical exploit payload executed against updated defense; 100% remediation proven.</p>
+    </div>
+  </div>
+
+  <h2>4. Core Pillars & Differentiators</h2>
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-title">
+        <span class="badge-blue">POLICY</span>
+        Policy-Based Access Control (PBAC / OPA)
+      </div>
+      <p class="card-desc">Open Policy Agent evaluates declarative Rego rules before packet routing. Direct Red-to-Blue peer traffic and container internet egress are strictly denied.</p>
+    </div>
+
+    <div class="card">
+      <div class="card-title">
+        <span class="badge-purple">AUDIT</span>
+        Tamper-Evident SHA-256 Hash Chain
+      </div>
+      <p class="card-desc">Evaluations are cryptographically linked via <code>prev_hash</code> pointers and HMAC-SHA256 signatures. Interactive verifier detects and flags database tampering down to the exact block index.</p>
+    </div>
+
+    <div class="card">
+      <div class="card-title">
+        <span class="badge-red">ADVERSARIAL</span>
+        LLM-Native Security Testing
+      </div>
+      <p class="card-desc">Automated detection of DAN jailbreaks, delimiter hijacking, system prompt extraction, token smuggling, and confidential vault token exfiltration.</p>
+    </div>
+
+    <div class="card">
+      <div class="card-title">
+        <span class="badge-green">HARDWARE</span>
+        Side-Channel & Jitter Telemetry
+      </div>
+      <p class="card-desc">Tracks microsecond inference duration variance to eliminate timing-based secret token extraction and noisy-neighbor cgroups CPU/memory starvation.</p>
+    </div>
+  </div>
+
+  <h2>5. Complete Technology Stack</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Layer</th>
+        <th>Technologies Used</th>
+        <th>Key Role in Bayora</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Frontend</strong></td>
+        <td>React 18, Vite, Tailwind CSS, Recharts, Lucide</td>
+        <td>Real-time dark mode cybersecurity dashboard, threat matrix, audit verifier</td>
+      </tr>
+      <tr>
+        <td><strong>Backend</strong></td>
+        <td>Python 3.11+, FastAPI, Uvicorn, SQLAlchemy</td>
+        <td>Asynchronous test orchestration, mediation controller, REST & WebSockets</td>
+      </tr>
+      <tr>
+        <td><strong>Policy Engine</strong></td>
+        <td>Open Policy Agent (OPA), Rego language</td>
+        <td>Micro-segmentation policy enforcement, zero-trust packet inspection</td>
+      </tr>
+      <tr>
+        <td><strong>Security Core</strong></td>
+        <td>SHA-256 Hash Chain, HMAC, Linux cgroups</td>
+        <td>Tamper-evident cryptographic ledger, side-channel jitter monitoring</td>
+      </tr>
+      <tr>
+        <td><strong>Deployment</strong></td>
+        <td>Docker, Docker Compose, Rootless Containers</td>
+        <td>Segmented internal networks (<code>bayora-red-net</code>, <code>bayora-blue-net</code>, <code>bayora-llm-net</code>)</td>
+      </tr>
+      <tr>
+        <td><strong>Monitoring</strong></td>
+        <td>Prometheus Metrics (<code>/metrics</code>), Grafana-ready</td>
+        <td>Real-time CPU, RAM, active sandbox health, and isolation telemetry</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2>6. Market Opportunity & Impact</h2>
+  <div class="grid-2">
+    <div>
+      <p style="font-size: 8.5pt; margin-bottom: 6px;">
+        <strong>Market Sizing:</strong> Global Generative AI Cybersecurity was estimated at <strong>$8.9B in 2025</strong>, reaching <strong>$56.8B by 2033</strong> (26.8% CAGR). India’s enterprise AI security market is projected to reach <strong>$9.92B by 2030</strong> (44.9% CAGR).
+      </p>
+      <p style="font-size: 8.5pt; margin: 0;">
+        <strong>Target Sectors:</strong> AI Startups, Enterprise Financial & Healthcare institutions handling sensitive data, Government & Defense contractors, and SaaS Providers.
+      </p>
+    </div>
+    <div class="card" style="background: #f1f5f9;">
+      <div class="card-title">Commercial Revenue Model</div>
+      <p class="card-desc">
+        • <strong>SaaS Subscription:</strong> Tiered model evaluations per month.<br>
+        • <strong>Enterprise Licensing:</strong> On-premises / VPC zero-trust deployment.<br>
+        • <strong>Managed AI Security:</strong> Continuous red-team testing as a service.
+      </p>
+    </div>
+  </div>
+
+  <div class="footer">
+    <span>Repository: <strong>https://github.com/subwaycookiecrunch/Bayora</strong></span>
+    <span>Page 2 of 2</span>
+  </div>
+
+</body>
+</html>
