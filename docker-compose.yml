@@ -1,0 +1,99 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    container_name: bayora-backend
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=postgresql://bayora_user:bayora_secret@db:5432/bayoradb
+      - BAYORA_SECRET_KEY=bayora-production-security-salt-2026
+      - BAYORA_ISOLATION_MODE=docker
+      - OPA_URL=http://opa:8181/v1/data/bayora/authz
+    depends_on:
+      db:
+        condition: service_healthy
+      opa:
+        condition: service_started
+    networks:
+      - bayora-mgmt-net
+      - bayora-red-net
+      - bayora-blue-net
+      - bayora-llm-net
+
+  frontend:
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
+    container_name: bayora-frontend
+    ports:
+      - "3000:80"
+      - "5173:80"
+    depends_on:
+      - backend
+    networks:
+      - bayora-mgmt-net
+
+  db:
+    image: postgres:16-alpine
+    container_name: bayora-db
+    environment:
+      - POSTGRES_USER=bayora_user
+      - POSTGRES_PASSWORD=bayora_secret
+      - POSTGRES_DB=bayoradb
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U bayora_user -d bayoradb"]
+      interval: 3s
+      timeout: 3s
+      retries: 5
+    networks:
+      - bayora-mgmt-net
+
+  opa:
+    image: openpolicyagent/opa:0.68.0
+    container_name: bayora-opa
+    ports:
+      - "8181:8181"
+    volumes:
+      - ./docker/opa:/etc/opa
+    command:
+      - "run"
+      - "--server"
+      - "--addr=0.0.0.0:8181"
+      - "/etc/opa/policy.rego"
+    networks:
+      - bayora-mgmt-net
+
+  prometheus:
+    image: prom/prometheus:v2.54.1
+    container_name: bayora-prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./docker/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+    networks:
+      - bayora-mgmt-net
+
+networks:
+  bayora-mgmt-net:
+    driver: bridge
+  # Micro-segmented isolated networks for sandboxes (no cross-talk permitted)
+  bayora-red-net:
+    driver: bridge
+    internal: true
+  bayora-blue-net:
+    driver: bridge
+    internal: true
+  bayora-llm-net:
+    driver: bridge
+    internal: true
+
+volumes:
+  postgres_data:
