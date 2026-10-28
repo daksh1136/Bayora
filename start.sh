@@ -26,6 +26,7 @@ if [ ! -d "frontend/node_modules" ]; then
 fi
 
 echo "Running automated backend verification suite..."
+export PYTHONPATH="$ROOT_DIR${PYTHONPATH:+:$PYTHONPATH}"
 pytest backend/tests -q
 
 if lsof -i :8000 >/dev/null 2>&1; then
@@ -38,7 +39,6 @@ export VITE_BACKEND_PORT=$PORT
 echo "=========================================================="
 echo " Starting Bayora Backend (FastAPI) on port $PORT..."
 echo "=========================================================="
-export PYTHONPATH="$ROOT_DIR"
 python3 -m uvicorn backend.app.main:app --host 0.0.0.0 --port $PORT &
 BACKEND_PID=$!
 

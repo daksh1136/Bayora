@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Navbar } from './components/Navbar';
+import { HashRain } from './components/HashRain';
 import { Sidebar, TabType } from './components/Sidebar';
 import { Dashboard } from './pages/Dashboard';
 import { OrchestratorPage } from './pages/OrchestratorPage';
@@ -22,7 +23,10 @@ export function App() {
     initApp();
 
     // Heartbeat poll for live telemetry
-    const interval = setInterval(fetchTelemetry, 3000);
+    const interval = setInterval(() => {
+      fetchTelemetry();
+      api.getEvaluations().then(setEvaluations).catch(() => {});
+    }, 3000);
     return () => clearInterval(interval);
   }, []);
 
@@ -46,12 +50,15 @@ export function App() {
   };
 
   return (
-    <div className="min-h-screen bg-[#080b11] text-slate-100 flex flex-col font-sans">
+    <div className="relative min-h-screen bg-[#080b11] text-slate-100 flex flex-col font-sans">
+      <HashRain />
+      <div className="relative z-10 flex flex-col flex-1">
       {/* Top Header */}
       <Navbar
         currentRole={currentRole}
         onRoleChange={setCurrentRole}
         telemetry={telemetry}
+        onNavigate={setActiveTab}
       />
 
       {/* Main Body */}
@@ -64,7 +71,7 @@ export function App() {
         />
 
         {/* Content Area */}
-        <main className="flex-1 overflow-y-auto p-6 lg:p-8 bg-gradient-to-b from-[#080b11] via-[#0b0f19] to-[#080b11]">
+        <main className="flex-1 overflow-y-auto p-6 lg:p-7 bg-transparent">
           <div className="max-w-7xl mx-auto">
             {activeTab === 'dashboard' && (
               <Dashboard
@@ -81,6 +88,7 @@ export function App() {
             {activeTab === 'side_channel' && <SideChannelPage />}
           </div>
         </main>
+      </div>
       </div>
     </div>
   );
