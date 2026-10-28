@@ -125,7 +125,7 @@ The local stack starts these services:
 - `opa` (`bayora-opa`): Open Policy Agent (`http://localhost:8181`)
 - `prometheus` (`bayora-prometheus`): Prometheus (`http://localhost:9090`)
 
-The Compose file includes demo credentials and a development secret. Replace them before exposing the stack outside a trusted local environment.
+The Compose file uses demo database credentials. If `BAYORA_SECRET_KEY` is not set, the app generates a fresh signing key at startup; configure this variable for stable login tokens across restarts. The default SQLite database is ephemeral on Render, so use PostgreSQL for data that must persist.
 
 ---
 

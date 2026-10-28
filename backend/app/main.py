@@ -1,5 +1,8 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse
+from fastapi.staticfiles import StaticFiles
+from pathlib import Path
 from backend.app.config import settings
 from backend.app.database import engine, Base, SessionLocal
 from backend.app.seed_data import seed_database
@@ -44,6 +47,8 @@ app.include_router(policies.router, prefix=settings.API_V1_STR)
 app.include_router(telemetry.router, prefix=settings.API_V1_STR)
 app.include_router(websocket.router)
 
+frontend_dist = Path(__file__).resolve().parents[2] / "frontend" / "dist"
+
 @app.get("/health")
 def health_check():
     return {
@@ -55,6 +60,9 @@ def health_check():
 
 @app.get("/")
 def root():
+    index_file = frontend_dist / "index.html"
+    if index_file.is_file():
+        return FileResponse(index_file)
     return {
         "system": settings.PROJECT_NAME,
         "team": "Avinya",
@@ -62,6 +70,9 @@ def root():
         "docs_url": "/docs",
         "api_v1": settings.API_V1_STR
     }
+
+if frontend_dist.is_dir():
+    app.mount("/", StaticFiles(directory=frontend_dist, html=True), name="frontend")
 
 if __name__ == "__main__":
     import uvicorn

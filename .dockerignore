@@ -1,0 +1,9 @@
+.git
+.venv
+.pytest_cache
+**/__pycache__
+**/node_modules
+**/dist
+*.db
+*.sqlite3
+.playwright-mcp

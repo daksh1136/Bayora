@@ -10,7 +10,7 @@ services:
       - "8000:8000"
     environment:
       - DATABASE_URL=postgresql://bayora_user:bayora_secret@db:5432/bayoradb
-      - BAYORA_SECRET_KEY=bayora-production-security-salt-2026
+      - BAYORA_SECRET_KEY=${BAYORA_SECRET_KEY:-}
       - BAYORA_ISOLATION_MODE=docker
       - OPA_URL=http://opa:8181/v1/data/bayora/authz
     depends_on:
